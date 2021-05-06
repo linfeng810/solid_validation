@@ -2,7 +2,7 @@
 
 from evtu import *
 
-tmax = 193
+tmax = 10
 # axis
 p1 = (0, 0, 0)
 p2 = (0, 0, 0.628)
@@ -32,7 +32,7 @@ for ts in range(tmax+1):
     #"solid_vldt_set6xVelAdapt_"+str(ts)+".pvtu"
     t88 = evtu(file_name)
     # new coordinate
-    t88.newCoordinateatLine(line, x_mat, x_spatial)
+    (x_mat, x_spatial)=t88.newCoordinateatLine(line)
     for i in range(x_mat.shape[0]):
         f1.write('%16.14f,%16.14f,%16.14f,'%(x_mat[i,0], x_mat[i,1], x_mat[i,2]))
         f1.write('%16.14f,%16.14f,%16.14f,'%(x_spatial[i,0], x_spatial[i,1], x_spatial[i,2]))

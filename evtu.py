@@ -66,13 +66,14 @@ class evtu(vtu):
 
 
 
-    def newCoordinateatLine(self, coordinates, probe_origx, prob_diagx):
+    def newCoordinateatLine(self, coordinates):
         """ 
         get spatial coordinate of material points that lie on cylinder axis
         before any deformation
         input:  coordinates [nx3] nparray of point coordinates
         output: probe_origx - material coordinate of points
                 probe_diagx - spatial coordinate of points
+        output is a tuple of two nparrays
         """
         # parameters to define axia line
         # p1 = (0,0,0)        # start point
@@ -91,6 +92,7 @@ class evtu(vtu):
 
         probe_diagx = self.ProbeData(coordinates,'DiagnosticCoordinate')
 
+        return (probe_origx, probe_diagx)
 
     def getStress(self, p):
         """ 
