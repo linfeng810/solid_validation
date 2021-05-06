@@ -2,15 +2,17 @@
 
 from evtu import *
 
-tmax = 10
+ss = 1e-5
+
+tmax = 193
 # axis
 p1 = (0, 0, 0)
 p2 = (0, 0, 0.628)
 resol = 50
 
 # points
-p3 = (0, 0.05, 0.314)
-p4 = (0, -0.05, 0.314)
+p3 = (0, 0.05-ss, 0.314)
+p4 = (0, -0.05+ss, 0.314)
 
 # generate points on line. store their coordinate to nparray "line"
 line = lineCoor(p1,p2,resol)
@@ -28,21 +30,22 @@ printProgressBar(0, tmax+1, prefix = 'Progress', suffix = 'Complete', length = 5
 
 for ts in range(tmax+1):
     # The data file
-    file_name = "/media/linfeng/Seagate Expansion Drive/data/module_validt/solid_vldt_set3_c1000steps_88.pvtu"
+    file_name = "/data2/linfeng/module_vldt/z05_set6/solid_vldt_set6xVelAdapt_"\
+	+str(ts)+".pvtu"
     #"solid_vldt_set6xVelAdapt_"+str(ts)+".pvtu"
     t88 = evtu(file_name)
     # new coordinate
     (x_mat, x_spatial)=t88.newCoordinateatLine(line)
     for i in range(x_mat.shape[0]):
-        f1.write('%16.10e,%16.10e,%16.10e,'%(x_mat[i,0], x_mat[i,1], x_mat[i,2]))
+        f1.write('%16.10e\t%16.10e\t%16.10e\t'%(x_mat[i,0], x_mat[i,1], x_mat[i,2]))
     for i in range(x_mat.shape[0]):
-        f1.write('%16.10e,%16.10e,%16.10e,'%(x_spatial[i,0], x_spatial[i,1], x_spatial[i,2]))
+        f1.write('%16.10e\t%16.10e\t%16.10e\t'%(x_spatial[i,0], x_spatial[i,1], x_spatial[i,2]))
     f1.write('\n')
 
     # stress at points
     for p in (p3,p4):
         stress = t88.getStress(p)
-        [f2.write('%16.10e,'%stress[i,j]) for i in range(3) for j in range(3)]
+        [f2.write('%16.10e\t'%stress[i,j]) for i in range(3) for j in range(3)]
     f2.write('\n')
 
     # update progress bar
