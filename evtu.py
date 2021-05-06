@@ -4,9 +4,6 @@ from vtktools import *
 from inTet import pointInside
 import numpy as np
 
-
-
-
 # retrieve data
 # pressure = self.GetScalarField('Pressure')   # pressure
 class evtu(vtu):
@@ -69,40 +66,30 @@ class evtu(vtu):
 
 
 
-    def newCoordinateatLine(self, p1, p2, resolution, probe_origx, prob_diagx):
+    def newCoordinateatLine(self, coordinates, probe_origx, prob_diagx):
         """ 
         get spatial coordinate of material points that lie on cylinder axis
         before any deformation
-        parameter:  p1 - axis starting point
-                    p2 - axis ending point
-                    resolution - subdivision
-        output: probe_origx - material points on axis
+        input:  coordinates [nx3] nparray of point coordinates
+        output: probe_origx - material coordinate of points
                 probe_diagx - spatial coordinate of points
         """
         # parameters to define axia line
-        p1 = (0,0,0)        # start point
-        p2 = (0,0,0.628)    # end point
-        resolution = 50         # 50 sample points
+        # p1 = (0,0,0)        # start point
+        # p2 = (0,0,0.628)    # end point
+        # resolution = 50         # 50 sample points
 
-        line = np.zeros([resolution+1, 3])
-        line[:,0] = [p1[0] + (p2[0] - p1[0])/resolution * i \
-                    for i in range(resolution+1)]
-        line[:,1] = [p1[1] + (p2[1] - p1[1])/resolution * i \
-                    for i in range(resolution+1)]
-        line[:,2] = [p1[2] + (p2[2] - p1[2])/resolution * i \
-                    for i in range(resolution+1)]
+        probe_origx = np.zeros([coordinates.shape[0], 3])
+        probe_diagx = np.zeros([coordinates.shape[0], 3])
 
-        probe_origx = np.zeros([resolution+1, 3])
-        probe_diagx = np.zeros([resolution+1, 3])
+        probe_origx[:,0] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateX')[i,0] \
+                            for i in range(coordinates.shape[0])]
+        probe_origx[:,1] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateY')[i,0] \
+                            for i in range(coordinates.shape[0])]
+        probe_origx[:,2] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateZ')[i,0] \
+                            for i in range(coordinates.shape[0])]
 
-        probe_origx[:,0] = [self.ProbeData(line, 'SolidOriginalCoordinateX')[i,0] \
-                            for i in range(resolution+1)]
-        probe_origx[:,1] = [self.ProbeData(line, 'SolidOriginalCoordinateY')[i,0] \
-                            for i in range(resolution+1)]
-        probe_origx[:,2] = [self.ProbeData(line, 'SolidOriginalCoordinateZ')[i,0] \
-                            for i in range(resolution+1)]
-
-        probe_diagx = self.ProbeData(line,'DiagnosticCoordinate')
+        probe_diagx = self.ProbeData(coordinates,'DiagnosticCoordinate')
 
 
     def getStress(self, p):
@@ -130,3 +117,43 @@ class evtu(vtu):
                 break
         
         return stress
+
+def lineCoor(p1,p2,resolution):
+    """
+    Given a line's starting and ending points, and resolution,
+    return points coordinates at the line.
+    return type: nparray[resolution+1, 3]
+    """
+    line = np.zeros([resolution+1, 3])
+    line[:,0] = [p1[0] + (p2[0] - p1[0])/resolution * i \
+                for i in range(resolution+1)]
+    line[:,1] = [p1[1] + (p2[1] - p1[1])/resolution * i \
+                for i in range(resolution+1)]
+    line[:,2] = [p1[2] + (p2[2] - p1[2])/resolution * i \
+                for i in range(resolution+1)]
+    return line
+
+
+
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    Taken from: https://stackoverflow.com/a/34325723 by Greenstick
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
