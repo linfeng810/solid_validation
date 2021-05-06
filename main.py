@@ -34,14 +34,15 @@ for ts in range(tmax+1):
     # new coordinate
     (x_mat, x_spatial)=t88.newCoordinateatLine(line)
     for i in range(x_mat.shape[0]):
-        f1.write('%16.14f,%16.14f,%16.14f,'%(x_mat[i,0], x_mat[i,1], x_mat[i,2]))
-        f1.write('%16.14f,%16.14f,%16.14f,'%(x_spatial[i,0], x_spatial[i,1], x_spatial[i,2]))
+        f1.write('%16.10e,%16.10e,%16.10e,'%(x_mat[i,0], x_mat[i,1], x_mat[i,2]))
+    for i in range(x_mat.shape[0]):
+        f1.write('%16.10e,%16.10e,%16.10e,'%(x_spatial[i,0], x_spatial[i,1], x_spatial[i,2]))
     f1.write('\n')
 
     # stress at points
     for p in (p3,p4):
         stress = t88.getStress(p)
-        [f2.write('%16.14f,'%stress[i,j]) for i in range(3) for j in range(3)]
+        [f2.write('%16.10e,'%stress[i,j]) for i in range(3) for j in range(3)]
     f2.write('\n')
 
     # update progress bar
