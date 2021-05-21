@@ -90,7 +90,8 @@ class evtu(vtu):
         probe_origx[:,2] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateZ')[i,0] \
                             for i in range(coordinates.shape[0])]
 
-        probe_diagx = self.ProbeData(coordinates,'DiagnosticCoordinate')
+        # probe_diagx = self.ProbeData(coordinates,'DiagnosticCoordinate') # This is wrong! DiagnosticCoordinate doesn't hold spatial coordinate!
+        probe_diagx = self.ProbeData(coordinates, 'SolidOldCoordinate') # SolidOldCoordinate accidentally stores just what we want!
 
         return (probe_origx, probe_diagx)
 

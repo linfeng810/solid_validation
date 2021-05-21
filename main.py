@@ -4,7 +4,7 @@ from evtu import *
 
 ss = 1e-5
 
-tmax = 193
+tmax = 85
 # axis
 p1 = (0, 0, 0)
 p2 = (0, 0, 0.628)
@@ -30,7 +30,7 @@ printProgressBar(0, tmax+1, prefix = 'Progress', suffix = 'Complete', length = 5
 
 for ts in range(tmax+1):
     # The data file
-    file_name = "/data2/linfeng/module_vldt/z05_set6/solid_vldt_set6xVelAdapt_"\
+    file_name = "/data2/linfeng/module_vldt/z08_xAdapt/solid_vldt_set3_"\
 	+str(ts)+".pvtu"
     #"solid_vldt_set6xVelAdapt_"+str(ts)+".pvtu"
     t88 = evtu(file_name)
