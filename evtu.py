@@ -31,6 +31,8 @@ class evtu(vtu):
         x_orig[:,1] = self.GetScalarField('SolidOriginalCoordinateY')
         x_orig[:,2] = self.GetScalarField('SolidOriginalCoordinateZ')
 
+        # save spatial coordinate to a new vector field
+        self.AddVectorField('spatial_coordinate', self.GetLocations())
 
         for i in range (self.nnod):
             newx = x_orig[i, 0]
@@ -71,7 +73,7 @@ class evtu(vtu):
         get spatial coordinate of material points that lie on cylinder axis
         before any deformation
         input:  coordinates [nx3] nparray of point coordinates
-        output: probe_origx - material coordinate of points
+        output: x probe_origx - material coordinate of points -> nolonger needed. because we already know.
                 probe_diagx - spatial coordinate of points
         output is a tuple of two nparrays
         """
@@ -80,20 +82,20 @@ class evtu(vtu):
         # p2 = (0,0,0.628)    # end point
         # resolution = 50         # 50 sample points
 
-        probe_origx = np.zeros([coordinates.shape[0], 3])
+        # probe_origx = np.zeros([coordinates.shape[0], 3])
         probe_diagx = np.zeros([coordinates.shape[0], 3])
 
-        probe_origx[:,0] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateX')[i,0] \
-                            for i in range(coordinates.shape[0])]
-        probe_origx[:,1] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateY')[i,0] \
-                            for i in range(coordinates.shape[0])]
-        probe_origx[:,2] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateZ')[i,0] \
-                            for i in range(coordinates.shape[0])]
+        # probe_origx[:,0] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateX')[i,0] \
+        #                     for i in range(coordinates.shape[0])]
+        # probe_origx[:,1] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateY')[i,0] \
+        #                     for i in range(coordinates.shape[0])]
+        # probe_origx[:,2] = [self.ProbeData(coordinates, 'SolidOriginalCoordinateZ')[i,0] \
+        #                     for i in range(coordinates.shape[0])]
 
         # probe_diagx = self.ProbeData(coordinates,'DiagnosticCoordinate') # This is wrong! DiagnosticCoordinate doesn't hold spatial coordinate!
-        probe_diagx = self.ProbeData(coordinates, 'SolidOldCoordinate') # SolidOldCoordinate accidentally stores just what we want!
+        probe_diagx = self.ProbeData(coordinates, 'spatial_coordinate', strict=True) # SolidOldCoordinate accidentally stores just what we want!
 
-        return (probe_origx, probe_diagx)
+        return probe_diagx
 
     def getStress(self, p):
         """ 

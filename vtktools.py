@@ -264,9 +264,9 @@ class vtu:
       
       self.ugrid.GetPoints ().SetPoint (i, longitude, latitude, depth)
 
-  def ProbeData(self, coordinates, name):
+  def ProbeData(self, coordinates, name, strict=False):
     """Interpolate field values at these coordinates."""
-    probe = VTU_Probe(self.ugrid, coordinates)
+    probe = VTU_Probe(self.ugrid, coordinates, strict)
     return probe.GetField(name)
 
   def RemoveField(self, name):
@@ -513,7 +513,7 @@ class VTU_Probe(object):
   """A class that combines a vtkProbeFilter with a list of invalid points (points that it failed to probe
   where we take the value of the nearest point)"""
 
-  def __init__(self, ugrid, coordinates):
+  def __init__(self, ugrid, coordinates, strict=False):
     # Initialise locator
     locator = vtk.vtkPointLocator()
     locator.SetDataSet(ugrid)
@@ -549,6 +549,7 @@ class VTU_Probe(object):
         nearest = locator.FindClosestPoint([coordinates[i][0], coordinates[i][1], coordinates[i][2]])
         self.invalidNodes.append((i, nearest))
     self.ugrid = ugrid
+    self.strict = strict
 
   def GetField(self, name):
     # Get final updated values
@@ -559,7 +560,7 @@ class VTU_Probe(object):
     array = arr([vtkdata.GetValue(i) for i in range(nt * nc)])
     
     # Fix the point data at invalid nodes
-    if len(self.invalidNodes) > 0:
+    if len(self.invalidNodes) > 0 :
       oldField = self.ugrid.GetPointData().GetArray(name)
       if oldField is None:
         oldField = self.ugrid.GetCellData().GetArray(name)
@@ -568,7 +569,10 @@ class VTU_Probe(object):
       components = oldField.GetNumberOfComponents()
       for invalidNode, nearest in self.invalidNodes:
         for comp in range(nc):
-          array[invalidNode * nc + comp] = oldField.GetValue(nearest * nc + comp)
+          if self.strict:
+            array[invalidNode * nc + comp] = float('NaN')
+          else:
+            array[invalidNode * nc + comp] = oldField.GetValue(nearest * nc + comp)
           
     # this is a copy and paster from vtu.GetField above:
     if nc==9:
